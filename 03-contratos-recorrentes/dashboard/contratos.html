@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contratos Recorrentes</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .cr-wrap { font-family: 'Segoe UI', sans-serif; padding: 24px; background: #f7f8fa; }
+    .cr-title { font-size: 20px; font-weight: 700; color: #1a2b4a; margin-bottom: 16px; }
+    .cr-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 16px; margin-bottom: 24px; }
+    .cr-card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .cr-label { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+    .cr-value { font-size: 22px; font-weight: 700; color: #1a2b4a; margin-top: 4px; }
+    .cr-value.alert { color: #dc2626; }
+    .cr-chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  </style>
+</head>
+<body>
+  <div class="cr-wrap">
+    <div class="cr-title">Contratos Recorrentes — Visão Gerencial</div>
+    <div class="cr-cards">
+      <div class="cr-card"><div class="cr-label">Contratos ativos</div><div class="cr-value" id="cr-ativos">—</div></div>
+      <div class="cr-card"><div class="cr-label">Valor recorrente / mês</div><div class="cr-value" id="cr-recorrente">—</div></div>
+      <div class="cr-card"><div class="cr-label">Faturamento vencido</div><div class="cr-value alert" id="cr-vencido">—</div></div>
+      <div class="cr-card"><div class="cr-label">Maior contrato</div><div class="cr-value" id="cr-maior">—</div></div>
+    </div>
+    <div class="cr-chart-box">
+      <canvas id="cr-chart" height="110"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // Dados de demonstração (substituir pela query real via DbExplorerSP.executeQuery)
+    const kpis = { ativos: 42, recorrente: 318500, vencido: 27400, maior: 48900 };
+    const porCentro = [
+      { centro: 'Comercial SP', valor: 142000 },
+      { centro: 'Comercial MG', valor: 98500 },
+      { centro: 'Comercial RJ', valor: 78000 },
+    ];
+
+    document.getElementById('cr-ativos').textContent = kpis.ativos;
+    document.getElementById('cr-recorrente').textContent = fmtBRL(kpis.recorrente);
+    document.getElementById('cr-vencido').textContent = fmtBRL(kpis.vencido);
+    document.getElementById('cr-maior').textContent = fmtBRL(kpis.maior);
+
+    new Chart(document.getElementById('cr-chart'), {
+      type: 'bar',
+      data: {
+        labels: porCentro.map(c => c.centro),
+        datasets: [{ label: 'Receita recorrente', data: porCentro.map(c => c.valor), backgroundColor: '#0d9488', borderRadius: 6 }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false }, title: { display: true, text: 'Receita por centro de resultado' } },
+        scales: { x: { ticks: { callback: v => 'R$ ' + (v/1000) + 'k' } } }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Comercial</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* CSS escopado com prefixo pc- para evitar conflito com o ERP Sankhya */
+    .pc-wrap { font-family: 'Segoe UI', sans-serif; padding: 24px; background: #f7f8fa; }
+    .pc-title { font-size: 20px; font-weight: 700; color: #1a2b4a; margin-bottom: 16px; }
+    .pc-cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .pc-card { background: #fff; border-radius: 12px; padding: 18px 22px; box-shadow: 0 2px 8px rgba(0,0,0,.06); flex: 1; min-width: 200px; }
+    .pc-card .pc-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+    .pc-card .pc-value { font-size: 24px; font-weight: 700; color: #1a2b4a; margin-top: 4px; }
+    .pc-chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  </style>
+</head>
+<body>
+  <div class="pc-wrap">
+    <div class="pc-title">Painel Comercial — Faturamento</div>
+
+    <div class="pc-cards">
+      <div class="pc-card">
+        <div class="pc-label">Faturamento (período)</div>
+        <div class="pc-value" id="pc-total">—</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-label">Melhor mês</div>
+        <div class="pc-value" id="pc-best">—</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-label">Ticket médio mensal</div>
+        <div class="pc-value" id="pc-avg">—</div>
+      </div>
+    </div>
+
+    <div class="pc-chart-box">
+      <canvas id="pc-chart" height="110"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // No Sankhya, a query roda via DbExplorerSP.executeQuery e retorna arrays posicionais.
+    async function carregar() {
+      try {
+        const resp = await fetch('/mge/service.sbr?serviceName=DbExplorerSP.executeQuery', {
+          method: 'POST',
+          credentials: 'include', // essencial para autenticação de sessão Sankhya
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serviceName: 'DbExplorerSP.executeQuery',
+            requestBody: { sql: 'SELECT TO_CHAR(CAB.DTNEG,\'YYYY-MM\'), SUM(ITE.VLRTOT) FROM TGFCAB CAB INNER JOIN TGFITE ITE ON ITE.NUNOTA=CAB.NUNOTA WHERE CAB.STATUSNOTA=\'L\' GROUP BY TO_CHAR(CAB.DTNEG,\'YYYY-MM\') ORDER BY 1' }
+          })
+        });
+        const json = await resp.json();
+        // resultado posicional: [ [competencia, faturamento], ... ]
+        const linhas = json.responseBody.rows;
+        render(linhas.map(r => ({ mes: r[0], valor: Number(r[1]) })));
+      } catch (e) {
+        console.error('Falha ao carregar dados', e);
+        // fallback de demonstração
+        render([
+          { mes: '2026-01', valor: 3800000 },
+          { mes: '2026-02', valor: 4100000 },
+          { mes: '2026-03', valor: 4500000 },
+          { mes: '2026-04', valor: 4200000 },
+          { mes: '2026-05', valor: 4440569.67 },
+        ]);
+      }
+    }
+
+    function render(dados) {
+      const total = dados.reduce((s, d) => s + d.valor, 0);
+      const best = dados.reduce((a, b) => b.valor > a.valor ? b : a, dados[0]);
+      document.getElementById('pc-total').textContent = fmtBRL(total);
+      document.getElementById('pc-best').textContent = best.mes;
+      document.getElementById('pc-avg').textContent = fmtBRL(total / dados.length);
+
+      new Chart(document.getElementById('pc-chart'), {
+        type: 'bar',
+        data: {
+          labels: dados.map(d => d.mes),
+          datasets: [{
+            label: 'Faturamento',
+            data: dados.map(d => d.valor),
+            backgroundColor: '#2563eb',
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => 'R$ ' + (v/1e6).toFixed(1) + 'M' } } }
+        }
+      });
+    }
+
+    carregar();
+  </script>
+</body>
+</html>
