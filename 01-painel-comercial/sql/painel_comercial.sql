@@ -11,8 +11,9 @@
 -- Parâmetros (substituir conforme ambiente):
 --   :TOPS_VENDA  -> lista de CODTIPOPER de venda
 --   :PARC_EXCL   -> parceiros a excluir (intercompany / ajustes)
---   :GRUPO_PROD  -> grupo de produto a filtrar (opcional)
---   :DT_INI / :DT_FIM -> período de análise
+--   :GRUPO_PROD  -> grupo de produto; NULL para incluir todos
+--   :DT_INI / :DT_FIM_EXCL -> início inclusivo e fim exclusivo do período
+--   Listas em IN/NOT IN devem ser expandidas em binds individuais pelo cliente SQL.
 -- ============================================================
 
 SELECT
@@ -23,14 +24,16 @@ INNER JOIN TGFITE ITE
         ON ITE.NUNOTA = CAB.NUNOTA
 WHERE CAB.STATUSNOTA = 'L'
   AND CAB.CODTIPOPER IN (:TOPS_VENDA)            -- ex.: 1100, 1117
-  AND CAB.DTNEG BETWEEN :DT_INI AND :DT_FIM
+  AND CAB.DTNEG >= :DT_INI
+  AND CAB.DTNEG < :DT_FIM_EXCL
   AND CAB.CODPARC NOT IN (:PARC_EXCL)            -- ex.: 307, 320, 1148
-  AND EXISTS (
+  AND ( :GRUPO_PROD IS NULL OR EXISTS (
         SELECT 1
         FROM TGFPRO PRO
         WHERE PRO.CODPROD = ITE.CODPROD
-          AND PRO.CODGRUPOPROD = :GRUPO_PROD     -- opcional
+          AND PRO.CODGRUPOPROD = :GRUPO_PROD
       )
+  )
 GROUP BY TO_CHAR(CAB.DTNEG, 'YYYY-MM')
 ORDER BY COMPETENCIA;
 
@@ -45,6 +48,7 @@ INNER JOIN TGFITE ITE  ON ITE.NUNOTA = CAB.NUNOTA
 INNER JOIN TSICUS CR   ON CR.CODCENCUS = CAB.CODCENCUS
 WHERE CAB.STATUSNOTA = 'L'
   AND CAB.CODTIPOPER IN (:TOPS_VENDA)
-  AND CAB.DTNEG BETWEEN :DT_INI AND :DT_FIM
+  AND CAB.DTNEG >= :DT_INI
+  AND CAB.DTNEG < :DT_FIM_EXCL
 GROUP BY CR.DESCRCENCUS
 ORDER BY FATURAMENTO DESC;
