@@ -33,5 +33,5 @@ O trecho atual escreve eventos em log e mascara parte do documento. **Ele não i
 
 - [`src/CreditController.java`](./src/CreditController.java) — controller REST
 - [`src/SerasaClient.java`](./src/SerasaClient.java) — cliente OAuth2 da API Serasa
-- [`src/LgpdAuditService.java`](./src/LgpdAuditService.java) — logging de conformidade
+- [`src/LgpdAuditService.java`](./src/LgpdAuditService.java) — exemplo de logging, sem auditoria persistente
 - [`src/SankhyaBOAction.snippet.java`](./src/SankhyaBOAction.snippet.java) — trecho da BO Action no Sankhya
