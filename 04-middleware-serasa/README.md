@@ -1,6 +1,8 @@
 # 04 — Middleware Spring Boot + API Serasa
 
-Middleware de integração entre o ERP Sankhya e a API do Serasa para consulta automatizada de crédito, com autenticação OAuth2 e conformidade LGPD.
+Exemplo didático de integração entre ERP Sankhya e serviço externo de consulta de crédito, com fluxo OAuth2 e pontos de auditoria. **Não é uma aplicação executável nem uma integração homologada para produção.**
+
+Os arquivos em `src/` são trechos ilustrativos. Faltam classes DTO, configuração de dependências e aplicação, testes, validação de entrada, autenticação/autorização do endpoint e persistência de auditoria. Endereços, payloads e regras da API externa devem ser confirmados com a documentação e o contrato do serviço antes de implementar uma integração real.
 
 ## 🎯 Problema
 
@@ -8,24 +10,24 @@ Consultas de crédito de clientes eram feitas manualmente, fora do ERP, sem rast
 
 ## 💡 Solução
 
-Um middleware em **Java / Spring Boot** que:
-1. Recebe a requisição do Sankhya (via BO Action).
-2. Autentica na API Serasa via **OAuth2** (client credentials).
-3. Consulta o score/situação do CPF/CNPJ.
-4. Registra log de conformidade **LGPD** (quem consultou, quando, qual finalidade).
-5. Devolve o resultado estruturado para o ERP.
+O exemplo em **Java / Spring Boot** ilustra como um middleware poderia:
+1. Receber a requisição do Sankhya (via BO Action).
+2. Autenticar na API Serasa via **OAuth2** (client credentials).
+3. Consultar o score/situação do CPF/CNPJ.
+4. Registrar informações de auditoria (quem consultou, quando e qual finalidade) em um sistema apropriado.
+5. Devolver o resultado estruturado para o ERP.
 
 ## 🏗️ Arquitetura
 
 ```
 Sankhya (BO Action)  →  Middleware Spring Boot  →  API Serasa (OAuth2)
                               │
-                              └→ Log LGPD (auditoria)
+                              └→ Serviço de auditoria (persistência pendente)
 ```
 
-## 🔒 Conformidade LGPD
+## 🔒 Dados e auditoria
 
-Toda consulta gera registro de auditoria com finalidade declarada, base legal e identificação do solicitante — atendendo aos princípios de finalidade e responsabilização da LGPD.
+O trecho atual escreve eventos em log e mascara parte do documento. **Ele não implementa uma trilha de auditoria persistente, não registra a base legal e não demonstra conformidade com a LGPD.** O `TODO` em `LgpdAuditService.java` marca a persistência ainda pendente. Antes de um uso real, é necessário definir base legal, controle de acesso, retenção, proteção dos logs, auditoria persistente e revisão jurídica/técnica apropriada.
 
 ## 📂 Arquivos
 
