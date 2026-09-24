@@ -1,8 +1,8 @@
 # 📊 Portfólio BI & Dados — Roger Wendell
 
-Portfólio técnico documentando casos reais de **Business Intelligence, integração de sistemas e engenharia de dados** desenvolvidos em ambiente de produção (ERP Sankhya + Oracle SQL + Spring Boot).
+Portfólio técnico de **Business Intelligence e dados**, com dashboards e consultas baseados em trabalho com ERP Sankhya e Oracle SQL. A integração Java/Spring Boot é apresentada como exemplo de arquitetura e trechos de código, não como aplicação pronta para implantação.
 
-> Cada projeto aqui partiu de um problema de negócio real: identificação da dor, modelagem da solução, validação contra dados de produção e entrega.
+> Os casos descrevem problemas de negócio, decisões técnicas e resultados quando disponíveis. Os trechos de integração têm finalidade demonstrativa; consulte o README de cada pasta para entender seu estado.
 
 ---
 
@@ -21,8 +21,7 @@ Atuo na interseção entre **negócio e tecnologia**: parametrização de ERP, d
 | 01 | Painel Comercial | Oracle SQL · Chart.js · HTML5 | Dashboard analítico |
 | 02 | Dashboard de Devoluções | Oracle SQL · Chart.js | Dashboard analítico |
 | 03 | Contratos Recorrentes | Oracle SQL · Sankhya param. · Chart.js | Dashboard + parametrização |
-| 04 | Middleware Serasa | Java · Spring Boot · OAuth2 · REST | Integração de sistemas |
-| 05 | Proposta Consultiva | Documentação · Análise de negócio | Consultoria técnica |
+| 04 | Middleware Serasa | Java · Spring Boot · OAuth2 · REST | Exemplo de integração |
 
 ---
 
@@ -30,8 +29,7 @@ Atuo na interseção entre **negócio e tecnologia**: parametrização de ERP, d
 
 - **Validação contra produção:** o Painel Comercial bate exatamente com o Portal de Vendas oficial.
 - **Domínio do modelo Sankhya:** regras críticas de agregação (evitar multiplicação por JOIN, agregação de estoque em subquery, filtros via EXISTS).
-- **Integração segura:** middleware com OAuth2, controller REST e logging de conformidade LGPD.
-- **Visão de negócio:** proposta consultiva de 5 projetos cobrindo rentabilidade, giro de estoque e gestão de crédito/inadimplência.
+- **Integração:** exemplo de fluxo OAuth2, controller REST e pontos de auditoria a implementar antes de qualquer uso real.
 
 ---
 
