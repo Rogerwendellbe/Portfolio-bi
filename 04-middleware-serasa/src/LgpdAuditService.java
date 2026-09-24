@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 /**
- * Serviço de logging de conformidade LGPD.
- * Toda consulta de crédito é registrada com finalidade, solicitante e timestamp,
- * atendendo aos princípios de finalidade (art. 6, I) e responsabilização (art. 6, X).
+ * Exemplo de logging de eventos de consulta de crédito.
+ * Este log não substitui uma trilha de auditoria persistente nem comprova
+ * conformidade com a LGPD.
  *
  * Em produção, persistir em tabela de auditoria imutável (append-only),
  * nunca apenas em log de texto.
@@ -21,13 +21,13 @@ public class LgpdAuditService {
 
     public void registrarConsulta(String documento, String solicitante, String finalidade) {
         // Documento mascarado no log para minimização de dados
-        log.info("[LGPD][CONSULTA] doc={} solicitante={} finalidade='{}' em={}",
+        log.info("[AUDITORIA_EXEMPLO][CONSULTA] doc={} solicitante={} finalidade='{}' em={}",
                 mascarar(documento), solicitante, finalidade, LocalDateTime.now());
-        // TODO produção: gravar em TB_AUDITORIA_LGPD (append-only)
+        // TODO antes de uso real: definir e implementar auditoria persistente e protegida.
     }
 
     public void registrarResultado(String documento, Integer score) {
-        log.info("[LGPD][RESULTADO] doc={} score={} em={}",
+        log.info("[AUDITORIA_EXEMPLO][RESULTADO] doc={} score={} em={}",
                 mascarar(documento), score, LocalDateTime.now());
     }
 
